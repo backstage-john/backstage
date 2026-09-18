@@ -1,0 +1,155 @@
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: logistics-platform
+  description: >-
+    All software and infrastructure for Aurora Logistics, a fictitious
+    freight/logistics company used as a Backstage reference example (see
+    docs/adrs/0001-satellite-repository-topology.md).
+spec:
+  owner: group:default/aurora-logistics
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: shipment-fulfillment
+  description: Order intake, warehouse state, and the REST surface for managing shipments.
+spec:
+  owner: group:default/team-shipments
+  domain: logistics-platform
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: fleet-tracking
+  description: Real-time tracking and routing/dispatch automation.
+spec:
+  owner: group:default/team-fleet
+  domain: logistics-platform
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: customer-experience
+  description: Customer- and operator-facing applications, including AI-assisted support.
+spec:
+  owner: group:default/team-frontend
+  domain: logistics-platform
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: platform-engineering
+  description: Shared infra, messaging, data, and observability that every other system depends on.
+spec:
+  owner: group:default/team-platform
+  domain: logistics-platform
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: aurora-logistics
+  description: Aurora Logistics — fictitious parent company for this Backstage reference example.
+spec:
+  type: organization
+  children:
+    - team-shipments
+    - team-fleet
+    - team-ai-agents
+    - team-platform
+    - team-frontend
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: team-shipments
+  description: Owns shipment intake and fulfillment.
+spec:
+  type: team
+  parent: aurora-logistics
+  children: []
+  members:
+    - avery-kim
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: team-fleet
+  description: Owns real-time tracking and routing.
+spec:
+  type: team
+  parent: aurora-logistics
+  children: []
+  members:
+    - priya-nair
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: team-ai-agents
+  description: Owns the A2A agents and their MCP-mediated tool access.
+spec:
+  type: team
+  parent: aurora-logistics
+  children: []
+  members:
+    - diego-alvarez
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: team-platform
+  description: Owns shared infra, messaging, data, and observability.
+spec:
+  type: team
+  parent: aurora-logistics
+  children: []
+  members:
+    - sam-oyelaran
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: team-frontend
+  description: Owns the ops console, customer portal, and design system.
+spec:
+  type: team
+  parent: aurora-logistics
+  children: []
+  members:
+    - morgan-lee
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: avery-kim
+spec:
+  memberOf: [team-shipments]
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: priya-nair
+spec:
+  memberOf: [team-fleet]
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: diego-alvarez
+spec:
+  memberOf: [team-ai-agents]
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: sam-oyelaran
+spec:
+  memberOf: [team-platform]
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: morgan-lee
+spec:
+  memberOf: [team-frontend]

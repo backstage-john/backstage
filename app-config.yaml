@@ -1,0 +1,41 @@
+# Catalog wiring for the Aurora Logistics reference example.
+# See docs/adrs/0001-satellite-repository-topology.md for the full design.
+#
+# This is NOT a complete Backstage app-config — it only defines the
+# `catalog` section. Once this repo is scaffolded into a runnable Backstage
+# instance (e.g. via `npx @backstage/create-app`), merge this section into
+# the generated app-config.yaml alongside `backend`, `integrations.github`,
+# `techdocs`, etc.
+catalog:
+  locations:
+    # Domain / System / Group / User entities for Aurora Logistics.
+    - type: url
+      target: https://github.com/backstage-john/backstage/blob/main/catalog/org.yaml
+      rules:
+        - allow: [Domain, System, Group, User]
+
+    # Satellite repos (see ADR-0001 for what each one demonstrates).
+    - type: url
+      target: https://github.com/backstage-john/aurora-shipments-api/blob/main/catalog-info.yaml
+    - type: url
+      target: https://github.com/backstage-john/aurora-tracking-service/blob/main/catalog-info.yaml
+    - type: url
+      target: https://github.com/backstage-john/aurora-routing-agent/blob/main/catalog-info.yaml
+    - type: url
+      target: https://github.com/backstage-john/aurora-support-agent/blob/main/catalog-info.yaml
+    - type: url
+      target: https://github.com/backstage-john/aurora-mcp-gateway/blob/main/catalog-info.yaml
+    - type: url
+      target: https://github.com/backstage-john/aurora-event-contracts/blob/main/catalog-info.yaml
+    - type: url
+      target: https://github.com/backstage-john/aurora-warehouse-db/blob/main/catalog-info.yaml
+    - type: url
+      target: https://github.com/backstage-john/aurora-observability-stack/blob/main/catalog-info.yaml
+    - type: url
+      target: https://github.com/backstage-john/aurora-infra/blob/main/catalog-info.yaml
+    - type: url
+      target: https://github.com/backstage-john/aurora-ops-console/blob/main/catalog-info.yaml
+    - type: url
+      target: https://github.com/backstage-john/aurora-customer-portal/blob/main/catalog-info.yaml
+    - type: url
+      target: https://github.com/backstage-john/aurora-design-system/blob/main/catalog-info.yaml
