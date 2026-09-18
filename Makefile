@@ -15,7 +15,10 @@ install: ## Install dependencies
 	yarn install
 
 run: install ## Start the app (frontend on :3000, backend on :7007)
-	yarn start
+	# NODE_USE_ENV_PROXY makes Node's built-in fetch (Node >=22.21) respect
+	# HTTPS_PROXY/NO_PROXY, which the catalog's GitHub integration needs when
+	# running behind a corporate/sandbox proxy. It's a no-op if unset.
+	NODE_USE_ENV_PROXY=1 yarn start
 
 build: install ## Build all packages
 	yarn build:all
