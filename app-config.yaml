@@ -17,6 +17,18 @@ app:
     #     config:
     #       path: /
 
+    # The standalone "Catalog Graph" nav page has no entity picker of its
+    # own — its root entities come only from a `rootEntityRefs` URL query
+    # param (set automatically when you click "View graph" from an
+    # entity's Relations card) or, as here, a static default. Without
+    # either, it renders an empty canvas. Rooting it at the top-level
+    # Domain lets it fan out to every System/Component/API/Resource in the
+    # Aurora Logistics catalog by default.
+    - page:catalog-graph:
+        config:
+          rootEntityRefs:
+            - domain:default/logistics-platform
+
     # Visit tracking records which pages users navigate to and is disabled by default.
     # Enable it to populate the Most Visited and Recently Visited widgets on the Home page.
     # Visit data is stored via UserSettings storage if available, otherwise browser localStorage.
