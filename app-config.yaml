@@ -170,7 +170,12 @@ proxy:
 techdocs:
   builder: 'local' # Alternatives - 'external'
   generator:
-    runIn: 'docker' # Alternatives - 'local'
+    # 'docker' (the create-app default) needs a running Docker daemon.
+    # 'local' runs mkdocs as a plain subprocess instead — no Docker
+    # required, but `pip install mkdocs-techdocs-core` must be available
+    # on the machine running the backend. Switch back to 'docker' if you'd
+    # rather start Docker Desktop than install that.
+    runIn: 'local' # Alternatives - 'docker'
   publisher:
     type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
 

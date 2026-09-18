@@ -1,0 +1,8 @@
+site_name: backstage-aggregator
+nav:
+  - Introduction: index.md
+  - Architecture Decision Records:
+      - Index: adrs/README.md
+      - 'ADR-0001: Satellite Repository Topology': adrs/0001-satellite-repository-topology.md
+plugins:
+  - techdocs-core

@@ -33,3 +33,18 @@ already sets `NODE_USE_ENV_PROXY=1` (supported on Node >=22.21) so it will,
 as long as `HTTPS_PROXY`/`NO_PROXY` are set correctly in your shell — that's
 a no-op if you're not behind a proxy. If entities still 401/403, set a real
 `GITHUB_TOKEN` with `repo` read access.
+
+## Troubleshooting: TechDocs fails with a Docker error
+
+TechDocs is configured to generate docs locally (`techdocs.generator.runIn:
+local` in [app-config.yaml](app-config.yaml)) rather than via Docker, so no
+Docker daemon is required. This does need the `mkdocs-techdocs-core` Python
+package available on the machine running the backend:
+
+```sh
+pip install mkdocs-techdocs-core
+```
+
+If you'd rather use the Docker-based generator instead (e.g. you already
+have Docker Desktop running and don't want a Python dependency), switch
+`runIn` back to `'docker'` in `app-config.yaml`.
