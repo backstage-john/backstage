@@ -55,14 +55,12 @@ have Docker Desktop running and don't want a Python dependency), switch
   `@backstage/plugin-api-docs` Swagger UI. No extra setup: any API entity
   with an OpenAPI definition gets this automatically (currently
   `shipments-api`).
-- **gRPC (`spec.type: grpc`)** — there's no built-in Swagger-equivalent for
-  Protobuf/gRPC in core Backstage, and the one community plugin
-  (`backstage-grpc-playground`) is unmaintained since 2022/2023 and built
-  for React 16/17 and the legacy frontend system, incompatible with this
-  app's React 18 / new frontend system. Instead, `packages/app/src/modules/grpcDocs`
-  adds a "gRPC Contract" tab (via `EntityContentBlueprint`, purely additive
-  — it doesn't touch the OpenAPI path) that parses the `.proto` source into
-  a service/RPC table and message list, plus a syntax-highlighted raw
-  source view (using `@backstage/core-components`' `CodeSnippet`, no new
-  dependency). Applies automatically to any API entity with `type: grpc`
-  (currently `tracking-api`).
+- **gRPC (`spec.type: grpc`)** — no viewer is wired up. There's no built-in
+  Swagger-equivalent for Protobuf/gRPC in core Backstage, and the one
+  community plugin (`backstage-grpc-playground` + its backend) isn't
+  usable here: its frontend needs the legacy Backstage app architecture
+  (`apis.ts`/`FlatRoutes`, React 16/17) this app doesn't use, and its
+  backend depends on `@backstage/backend-common`, which Backstage has
+  deprecated. `tracking-api`'s `.proto` contract is currently only visible
+  via the entity's "Raw" definition text and the repo's own
+  `proto/tracking.proto` file.
