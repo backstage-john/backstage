@@ -62,7 +62,7 @@ to stamp out new ones.
 | Repo | Stack | Catalog entities | System | Demonstrates |
 | --- | --- | --- | --- | --- |
 | `aurora-shipments-api` | Node.js/TypeScript, Express | `Component` (service) + `API` (`openapi`) | shipment-fulfillment | REST API cataloging, `api-docs` plugin, `providesApis` |
-| `aurora-tracking-service` | Go, gRPC | `Component` (service) + `API` (`grpc`, `.proto` as definition) | fleet-tracking | Protobuf/gRPC API cataloging alongside REST |
+| `aurora-tracking-service` | Node.js, `@grpc/grpc-js` | `Component` (service) + `API` (`grpc`, `.proto` as definition) | fleet-tracking | Protobuf/gRPC API cataloging alongside REST, backed by a real runnable gRPC server (unary + server-streaming) |
 | `aurora-routing-agent` | Python, A2A server SDK | `Component` (`type: agent`) + `API` (`type: a2a`, Agent Card at `/.well-known/agent.json`) | fleet-tracking | Cataloging an autonomous agent and its skills/Agent Card as a discoverable API |
 | `aurora-support-agent` | Python, A2A client + server | `Component` (`type: agent`) + `API` (`type: a2a`) | customer-experience | Agent-to-agent orchestration (`consumesApis` another agent's A2A API), agents as first-class catalog citizens |
 | `aurora-mcp-gateway` | TypeScript, `@modelcontextprotocol/sdk` | `Component` (`type: mcp-server`) + `API` (`type: mcp`, tool/resource manifest as definition) | platform-engineering | Governed tool/context access for LLM agents: wraps `aurora-shipments-api`, `aurora-tracking-service`, and `aurora-warehouse-db` behind auditable MCP tools instead of agents calling internal APIs directly |
