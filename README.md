@@ -48,3 +48,19 @@ pip install mkdocs-techdocs-core
 If you'd rather use the Docker-based generator instead (e.g. you already
 have Docker Desktop running and don't want a Python dependency), switch
 `runIn` back to `'docker'` in `app-config.yaml`.
+
+## API contract viewers
+
+- **REST (`spec.type: openapi`)** — rendered with the built-in
+  `@backstage/plugin-api-docs` Swagger UI. No extra setup: any API entity
+  with an OpenAPI definition gets this automatically (currently
+  `shipments-api`).
+- **gRPC (`spec.type: grpc`)** — no viewer is wired up. There's no built-in
+  Swagger-equivalent for Protobuf/gRPC in core Backstage, and the one
+  community plugin (`backstage-grpc-playground` + its backend) isn't
+  usable here: its frontend needs the legacy Backstage app architecture
+  (`apis.ts`/`FlatRoutes`, React 16/17) this app doesn't use, and its
+  backend depends on `@backstage/backend-common`, which Backstage has
+  deprecated. `tracking-api`'s `.proto` contract is currently only visible
+  via the entity's "Raw" definition text and the repo's own
+  `proto/tracking.proto` file.
