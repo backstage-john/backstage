@@ -15,6 +15,7 @@ team actually deals with:
 * REST APIs
 * Protobuf/gRPC APIs
 * AI agents speaking the [Agent2Agent (A2A) protocol](https://a2a-protocol.org/)
+* Tool/context access for those agents via [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) servers
 * Event-driven messaging (Kafka)
 * Databases
 * Observability tooling (metrics, dashboards, alerting)
@@ -64,6 +65,7 @@ to stamp out new ones.
 | `aurora-tracking-service` | Go, gRPC | `Component` (service) + `API` (`grpc`, `.proto` as definition) | fleet-tracking | Protobuf/gRPC API cataloging alongside REST |
 | `aurora-routing-agent` | Python, A2A server SDK | `Component` (`type: agent`) + `API` (`type: a2a`, Agent Card at `/.well-known/agent.json`) | fleet-tracking | Cataloging an autonomous agent and its skills/Agent Card as a discoverable API |
 | `aurora-support-agent` | Python, A2A client + server | `Component` (`type: agent`) + `API` (`type: a2a`) | customer-experience | Agent-to-agent orchestration (`consumesApis` another agent's A2A API), agents as first-class catalog citizens |
+| `aurora-mcp-gateway` | TypeScript, `@modelcontextprotocol/sdk` | `Component` (`type: mcp-server`) + `API` (`type: mcp`, tool/resource manifest as definition) | platform-engineering | Governed tool/context access for LLM agents: wraps `aurora-shipments-api`, `aurora-tracking-service`, and `aurora-warehouse-db` behind auditable MCP tools instead of agents calling internal APIs directly |
 | `aurora-event-contracts` | Avro/Protobuf schemas, AsyncAPI | `API` (`type: asyncapi`) + `Resource` (`type: kafka-topic`) per topic | platform-engineering | Kafka topic/schema contracts as catalog entities shared by producers and consumers |
 | `aurora-warehouse-db` | Terraform + migrations (Postgres, Redis) | `Resource` (`type: database`, `type: cache`) | platform-engineering | Database/cache resources with `dependsOn` edges from the services that use them |
 | `aurora-observability-stack` | Helm/Terraform (Prometheus, Grafana, Loki, Tempo, OTel Collector) | `Resource` (`type: observability`) | platform-engineering | `grafana`, Prometheus/alerting annotations surfaced on every component that depends on this resource |
@@ -90,6 +92,7 @@ flowchart LR
         tracking[aurora-tracking-service]
     end
     subgraph Platform
+        mcp[aurora-mcp-gateway]
         events[aurora-event-contracts]
         db[aurora-warehouse-db]
         infra[aurora-infra]
@@ -102,9 +105,13 @@ flowchart LR
     support -- A2A task --> routing
     ops --> shipments
     ops --> tracking
-    routing --> tracking
-    routing --> shipments
+    support -- MCP tool call --> mcp
+    routing -- MCP tool call --> mcp
+    mcp --> shipments
+    mcp --> tracking
+    mcp --> db
     shipments --> db
+    routing --> tracking
     shipments -- produces --> events
     tracking -- produces --> events
     routing -- consumes --> events
@@ -124,8 +131,8 @@ flowchart LR
   `aurora-logistics` so every satellite repo's `catalog-info.yaml` is picked
   up without manual registration.
 * Scaffolder templates for the recurring shapes: REST service, gRPC service,
-  A2A agent, Kafka contract package, frontend app — so new satellite repos
-  stay consistent with this topology.
+  A2A agent, MCP server, Kafka contract package, frontend app — so new
+  satellite repos stay consistent with this topology.
 * Aggregated TechDocs, `api-docs`, Kubernetes, and Grafana plugins wired to
   read the annotations each satellite repo publishes.
 
@@ -134,9 +141,13 @@ flowchart LR
 **Positive**
 
 * Every integration point called out in the goal (REST, protobuf/gRPC, A2A
-  agents, Kafka, databases, observability, backend apps, frontend apps) has
-  a concrete, independently-ownable repo behind it, so the example reads as
-  a real organization rather than a synthetic demo.
+  agents, MCP tool servers, Kafka, databases, observability, backend apps,
+  frontend apps) has a concrete, independently-ownable repo behind it, so
+  the example reads as a real organization rather than a synthetic demo.
+* Separating `aurora-mcp-gateway` from the agents themselves mirrors how
+  enterprises actually govern LLM tool access: one auditable, centrally
+  owned surface for "what can an agent touch", instead of every agent
+  embedding its own ad hoc API clients and credentials.
 * Cross-repo relationships (`dependsOn`, `providesApis`, `consumesApis`)
   are genuine multi-team, multi-repo edges, which is what actually
   exercises Backstage's catalog graph and ownership model.
@@ -145,7 +156,7 @@ flowchart LR
 
 **Negative / trade-offs**
 
-* Twelve repositories (including this one) is real overhead to scaffold,
+* Thirteen repositories (including this one) is real overhead to scaffold,
   seed with plausible sample data, and keep CI-green; each needs at least a
   minimal working service/schema/UI, not just a `catalog-info.yaml` stub.
 * Some satellite repos (e.g. `aurora-event-contracts`, `aurora-infra`) don't
@@ -153,11 +164,18 @@ flowchart LR
   catalog entities are mostly `Resource`/`API` rather than `Component`,
   which should be made clear in their own `catalog-info.yaml` so they aren't
   mistaken for deployable services.
-* A2A is an emerging protocol; Backstage has no first-party `API` type or
-  plugin for it yet, so `aurora-routing-agent`/`aurora-support-agent` will
-  use a custom `spec.type: a2a` convention (mirroring how `grpc` and
-  `asyncapi` are already handled as community conventions) rather than a
-  built-in one. This should be revisited if/when official support lands.
+* A2A and MCP are both emerging protocols; Backstage has no first-party
+  `API` type or plugin for either yet, so the agent and gateway repos will
+  use custom `spec.type: a2a` / `spec.type: mcp` conventions (mirroring how
+  `grpc` and `asyncapi` are already handled as community conventions)
+  rather than built-in ones. This should be revisited if/when official
+  support lands.
+* Routing every agent's access to internal systems through
+  `aurora-mcp-gateway` adds an extra hop and a repo that must stay in sync
+  with the APIs it wraps (`aurora-shipments-api`, `aurora-tracking-service`,
+  `aurora-warehouse-db`); its `providesApis`/`dependsOn` edges need to be
+  kept accurate or the catalog will misrepresent what agents can actually
+  reach.
 
 ## Alternatives considered
 
