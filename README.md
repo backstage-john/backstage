@@ -22,6 +22,14 @@ make run       # starts the frontend (:3000) and backend (:7007)
 
 See `make help` for other targets (`build`, `test`, `lint`, `clean`).
 
-The GitHub catalog locations in [app-config.yaml](app-config.yaml) need a
-`GITHUB_TOKEN` environment variable with `repo` read access to resolve; set
-it before `make run` if you want the `aurora-*` entities to load.
+## Troubleshooting: catalog graph is empty / entities won't load
+
+The catalog's GitHub `url` locations (see [app-config.yaml](app-config.yaml))
+need outbound HTTPS access to `api.github.com`. Since these are public
+repos, no `GITHUB_TOKEN` is strictly required, but if you're behind a
+corporate or sandboxed proxy, Node's built-in `fetch` (used by the catalog's
+GitHub integration) does **not** read `HTTPS_PROXY` by default. `make run`
+already sets `NODE_USE_ENV_PROXY=1` (supported on Node >=22.21) so it will,
+as long as `HTTPS_PROXY`/`NO_PROXY` are set correctly in your shell — that's
+a no-op if you're not behind a proxy. If entities still 401/403, set a real
+`GITHUB_TOKEN` with `repo` read access.
