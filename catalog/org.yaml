@@ -5,45 +5,148 @@ metadata:
   description: >-
     All software and infrastructure for Aurora Logistics, a fictitious
     freight/logistics company used as a Backstage reference example (see
-    docs/adrs/0001-satellite-repository-topology.md).
+    docs/adrs/0001-satellite-repository-topology.md and, for how its
+    subdomains map onto DDD bounded contexts, ADR-0002).
 spec:
   owner: group:default/aurora-logistics
+---
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: shipment-fulfillment
+  description: >-
+    Order intake, warehouse state, and inventory allocation — one of
+    Aurora's two core subdomains (see docs/ddd/glossary.md).
+  tags: [subdomain, core-domain]
+  links:
+    - title: Ubiquitous language glossary
+      url: https://github.com/backstage-john/backstage/blob/main/docs/ddd/glossary.md#shipment-fulfillment
+    - title: Context map
+      url: https://github.com/backstage-john/backstage/blob/main/docs/ddd/context-map.md
+spec:
+  owner: group:default/team-shipments
+  subdomainOf: logistics-platform
+---
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: fleet-tracking
+  description: >-
+    Real-time vehicle/package tracking and routing/dispatch automation —
+    one of Aurora's two core subdomains (see docs/ddd/glossary.md).
+  tags: [subdomain, core-domain]
+  links:
+    - title: Ubiquitous language glossary
+      url: https://github.com/backstage-john/backstage/blob/main/docs/ddd/glossary.md#fleet-tracking
+    - title: Context map
+      url: https://github.com/backstage-john/backstage/blob/main/docs/ddd/context-map.md
+spec:
+  owner: group:default/team-fleet
+  subdomainOf: logistics-platform
+---
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: customer-experience
+  description: >-
+    Customer- and operator-facing applications — a supporting subdomain
+    (see docs/ddd/glossary.md).
+  tags: [subdomain, supporting-domain]
+  links:
+    - title: Ubiquitous language glossary
+      url: https://github.com/backstage-john/backstage/blob/main/docs/ddd/glossary.md#customer-experience
+    - title: Context map
+      url: https://github.com/backstage-john/backstage/blob/main/docs/ddd/context-map.md
+spec:
+  owner: group:default/team-frontend
+  subdomainOf: logistics-platform
+---
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: platform-engineering
+  description: >-
+    Shared infra, messaging, data, and observability that every other
+    subdomain depends on — a generic subdomain (see docs/ddd/glossary.md).
+  tags: [subdomain, generic-domain]
+  links:
+    - title: Ubiquitous language glossary
+      url: https://github.com/backstage-john/backstage/blob/main/docs/ddd/glossary.md#platform-engineering
+    - title: Context map
+      url: https://github.com/backstage-john/backstage/blob/main/docs/ddd/context-map.md
+spec:
+  owner: group:default/team-platform
+  subdomainOf: logistics-platform
+---
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: agent-orchestration
+  description: >-
+    AI agent automation for dispatch and customer support, and their
+    tool/context access — a supporting subdomain today, and a candidate
+    for promotion to core as AI investment grows (see docs/ddd/glossary.md).
+  tags: [subdomain, supporting-domain]
+  links:
+    - title: Ubiquitous language glossary
+      url: https://github.com/backstage-john/backstage/blob/main/docs/ddd/glossary.md#agent-orchestration
+    - title: Context map
+      url: https://github.com/backstage-john/backstage/blob/main/docs/ddd/context-map.md
+spec:
+  owner: group:default/team-ai-agents
+  subdomainOf: logistics-platform
 ---
 apiVersion: backstage.io/v1alpha1
 kind: System
 metadata:
   name: shipment-fulfillment
   description: Order intake, warehouse state, and the REST surface for managing shipments.
+  tags: [bounded-context, core-domain]
 spec:
   owner: group:default/team-shipments
-  domain: logistics-platform
+  domain: shipment-fulfillment
 ---
 apiVersion: backstage.io/v1alpha1
 kind: System
 metadata:
   name: fleet-tracking
   description: Real-time tracking and routing/dispatch automation.
+  tags: [bounded-context, core-domain]
 spec:
   owner: group:default/team-fleet
-  domain: logistics-platform
+  domain: fleet-tracking
 ---
 apiVersion: backstage.io/v1alpha1
 kind: System
 metadata:
   name: customer-experience
-  description: Customer- and operator-facing applications, including AI-assisted support.
+  description: Customer- and operator-facing applications.
+  tags: [bounded-context, supporting-domain]
 spec:
   owner: group:default/team-frontend
-  domain: logistics-platform
+  domain: customer-experience
 ---
 apiVersion: backstage.io/v1alpha1
 kind: System
 metadata:
   name: platform-engineering
   description: Shared infra, messaging, data, and observability that every other system depends on.
+  tags: [bounded-context, generic-domain]
 spec:
   owner: group:default/team-platform
-  domain: logistics-platform
+  domain: platform-engineering
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: agent-orchestration
+  description: >-
+    AI agents (dispatch routing, customer support) and their governed
+    MCP-mediated tool access.
+  tags: [bounded-context, supporting-domain]
+spec:
+  owner: group:default/team-ai-agents
+  domain: agent-orchestration
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Group
@@ -87,7 +190,9 @@ apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
   name: team-ai-agents
-  description: Owns the A2A agents and their MCP-mediated tool access.
+  description: >-
+    Owns the agent-orchestration bounded context: the A2A agents and their
+    MCP-mediated tool access.
 spec:
   type: team
   parent: aurora-logistics

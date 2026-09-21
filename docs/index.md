@@ -8,3 +8,12 @@ backend/frontend apps across a dozen satellite repositories.
 
 See [ADR-0001](adrs/0001-satellite-repository-topology.md) for the full
 repo topology and design rationale.
+
+## Domain-driven design
+
+Aurora Logistics' Systems are modeled as DDD bounded contexts, grouped
+into core/supporting/generic subdomains. See
+[ADR-0002](adrs/0002-domain-driven-design-model.md) for the decision,
+[the ubiquitous language glossary](ddd/glossary.md) for each subdomain's
+own vocabulary, and [the context map](ddd/context-map.md) for how the
+bounded contexts relate to each other.

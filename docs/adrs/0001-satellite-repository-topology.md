@@ -41,15 +41,23 @@ customer-facing tracking portal.
 
 ## Decision
 
-We will model Aurora Logistics as a GitHub organization, `aurora-logistics`,
-containing the repositories below in addition to this aggregator. Every
-satellite repo owns a `catalog-info.yaml` at its root (discovered via the
-catalog's GitHub org-discovery processor pointing at `aurora-logistics`,
-default branch), and this `backstage` repo owns the `System`/`Domain`/
-`Group` entities that tie them together plus the scaffolder templates used
-to stamp out new ones.
+We will model Aurora Logistics as a set of repositories under the
+`backstage-john` GitHub organization, in addition to this aggregator. Every
+satellite repo owns a `catalog-info.yaml` at its root, registered as an
+explicit `type: url` catalog location in this repo's `app-config.yaml`
+(one entry per repo, not org-wide discovery — see "Negative / trade-offs"
+below), and this `backstage` repo owns the `System`/`Domain`/`Group`
+entities that tie them together plus the scaffolder templates used to
+stamp out new ones.
 
 ### Domain and System grouping
+
+> Amended by [ADR-0002](0002-domain-driven-design-model.md): the single
+> `logistics-platform` Domain below was split into `logistics-platform`
+> plus five subdomains (one per System, including a new
+> `agent-orchestration` System), to represent Aurora's DDD bounded
+> contexts explicitly. The table below reflects the original,
+> pre-DDD grouping.
 
 * **Domain**: `logistics-platform` (owns everything below)
   * **System**: `shipment-fulfillment` — order intake, warehouse state, REST surface
@@ -63,8 +71,8 @@ to stamp out new ones.
 | --- | --- | --- | --- | --- |
 | `aurora-shipments-api` | Node.js/TypeScript, Express | `Component` (service) + `API` (`openapi`) | shipment-fulfillment | REST API cataloging, `api-docs` plugin, `providesApis` |
 | `aurora-tracking-service` | Node.js, `@grpc/grpc-js` | `Component` (service) + `API` (`grpc`, `.proto` as definition) | fleet-tracking | Protobuf/gRPC API cataloging alongside REST, backed by a real runnable gRPC server (unary + server-streaming) |
-| `aurora-routing-agent` | Python, A2A server SDK | `Component` (`type: agent`) + `API` (`type: a2a`, Agent Card at `/.well-known/agent.json`) | fleet-tracking | Cataloging an autonomous agent and its skills/Agent Card as a discoverable API |
-| `aurora-support-agent` | Python, A2A client + server | `Component` (`type: agent`) + `API` (`type: a2a`) | customer-experience | Agent-to-agent orchestration (`consumesApis` another agent's A2A API), agents as first-class catalog citizens |
+| `aurora-routing-agent` | Python, A2A server SDK | `Component` (`type: agent`) + `API` (`type: a2a`, Agent Card at `/.well-known/agent.json`) | agent-orchestration | Cataloging an autonomous agent and its skills/Agent Card as a discoverable API |
+| `aurora-support-agent` | Python, A2A client + server | `Component` (`type: agent`) + `API` (`type: a2a`) | agent-orchestration | Agent-to-agent orchestration (`consumesApis` another agent's A2A API), agents as first-class catalog citizens |
 | `aurora-mcp-gateway` | TypeScript, `@modelcontextprotocol/sdk` | `Component` (`type: mcp-server`) + `API` (`type: mcp`, tool/resource manifest as definition) | platform-engineering | Governed tool/context access for LLM agents: wraps `aurora-shipments-api`, `aurora-tracking-service`, and `aurora-warehouse-db` behind auditable MCP tools instead of agents calling internal APIs directly |
 | `aurora-event-contracts` | Avro/Protobuf schemas, AsyncAPI | `API` (`type: asyncapi`) + `Resource` (`type: kafka-topic`) per topic | platform-engineering | Kafka topic/schema contracts as catalog entities shared by producers and consumers |
 | `aurora-warehouse-db` | Terraform + migrations (Postgres, Redis) | `Resource` (`type: database`, `type: cache`) | platform-engineering | Database/cache resources with `dependsOn` edges from the services that use them |
@@ -124,12 +132,11 @@ flowchart LR
 ### Aggregator responsibilities (this repo)
 
 * `catalog-info.yaml` files (or a single `org.yaml`) for the `logistics-platform`
-  Domain, its four Systems, and the Aurora Logistics teams (`Group` entities:
+  Domain, its Systems, and the Aurora Logistics teams (`Group` entities:
   `team-shipments`, `team-fleet`, `team-ai-agents`, `team-platform`,
   `team-frontend`) plus their members (`User` entities).
-* Catalog `LocationProcessor` config performing org-wide discovery against
-  `aurora-logistics` so every satellite repo's `catalog-info.yaml` is picked
-  up without manual registration.
+* Catalog `locations` config in `app-config.yaml` with one explicit
+  `type: url` entry per satellite repo's `catalog-info.yaml`.
 * Scaffolder templates for the recurring shapes: REST service, gRPC service,
   A2A agent, MCP server, Kafka contract package, frontend app — so new
   satellite repos stay consistent with this topology.

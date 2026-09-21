@@ -10,6 +10,7 @@ style.
 | ADR | Title | Status |
 | --- | --- | --- |
 | [0001](0001-satellite-repository-topology.md) | Satellite repository topology for the reference enterprise catalog | Accepted |
+| [0002](0002-domain-driven-design-model.md) | Modeling Aurora Logistics' bounded contexts and subdomains | Accepted |
 
 ## Adding a new ADR
 

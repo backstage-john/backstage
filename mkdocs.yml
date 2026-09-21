@@ -4,5 +4,9 @@ nav:
   - Architecture Decision Records:
       - Index: adrs/README.md
       - 'ADR-0001: Satellite Repository Topology': adrs/0001-satellite-repository-topology.md
+      - 'ADR-0002: Domain-Driven Design Model': adrs/0002-domain-driven-design-model.md
+  - Domain-Driven Design:
+      - Ubiquitous Language Glossary: ddd/glossary.md
+      - Context Map: ddd/context-map.md
 plugins:
   - techdocs-core
